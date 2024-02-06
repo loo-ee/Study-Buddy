@@ -5,7 +5,7 @@ import com.louie.studybuddy.models.User
 object Session {
     private var loggedInUser: User? = null
 
-    fun setLoggedInUser(user: User) {
+    fun setLoggedInUser(user: User?) {
         this.loggedInUser = user
     }
 

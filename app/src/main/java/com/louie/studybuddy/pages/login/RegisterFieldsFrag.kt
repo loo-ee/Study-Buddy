@@ -13,7 +13,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.android.volley.Request
-import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -24,7 +23,7 @@ import com.louie.studybuddy.storage.ServerData
 import org.json.JSONObject
 import java.io.IOException
 
-class RegisterFragment: DialogFragment() {
+class RegisterFieldsFrag: DialogFragment() {
     private lateinit var view: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,12 +89,12 @@ class RegisterFragment: DialogFragment() {
         val request = JsonObjectRequest(
             Request.Method.POST,
             ServerData.serverURI + "/auth/register/",
-            (body as Map<*, *>?)?.let { JSONObject(it) },
-            fun(_: JSONObject) {
+            JSONObject(body as Map<String, String>),
+            {_: JSONObject ->
                 Toast.makeText(view.context, "Registered Successfully", Toast.LENGTH_SHORT).show()
                 login(view.context, body["email"]!!, body["password"]!!)
             },
-            fun(_: VolleyError) {
+            {_: VolleyError ->
                 Toast.makeText(view.context, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         )
@@ -112,8 +111,8 @@ class RegisterFragment: DialogFragment() {
         val request = JsonObjectRequest(
             Request.Method.POST,
             ServerData.serverURI + "/auth/token/",
-            (body as Map<*, *>?)?.let { JSONObject(it) },
-            fun(response: JSONObject) {
+            JSONObject(body as Map<String, String>),
+            {response: JSONObject ->
                 val intent = Intent(context, HomePage::class.java)
 
                 try {
@@ -123,7 +122,7 @@ class RegisterFragment: DialogFragment() {
                     Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                 }
             },
-            fun(error: VolleyError) {
+            {error: VolleyError ->
                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                 Log.d("exception_caught", error.networkResponse.statusCode.toString());
             }

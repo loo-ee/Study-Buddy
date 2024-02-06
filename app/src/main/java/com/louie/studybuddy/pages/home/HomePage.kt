@@ -12,6 +12,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.auth0.jwt.JWT
+import com.auth0.jwt.exceptions.JWTDecodeException
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -55,15 +56,23 @@ class HomePage : AppCompatActivity() {
 
         val content = FileHandler.readFromFile(context, "auth")
         val token = objectMapper.readValue(content, Token::class.java)
-        val decodedJWT = JWT.decode(token.getAccess())
-        val userEmail = decodedJWT.getClaim("email").toString()
+        val userEmail: String
+        try {
+            val decodedJWT = JWT.decode(token.getAccess())
+            userEmail = decodedJWT.getClaim("email").asString()
+        } catch (e: JWTDecodeException) {
+            Toast.makeText(this, "Session Expired", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, LoginPage::class.java)
+            startActivity(intent)
+            return
+        }
 
         val requestQueue = Volley.newRequestQueue(context)
         val request = object: JsonObjectRequest(
             Request.Method.GET,
             ServerData.serverURI + "/auth/get-user/?user_email=" + userEmail,
             null,
-            fun(response: JSONObject) {
+            {response: JSONObject ->
                 try {
                     val responseBody = response.toString()
                     val foundUser = objectMapper.readValue(responseBody, User::class.java)
@@ -72,8 +81,8 @@ class HomePage : AppCompatActivity() {
                     Log.d("exception_caught", e.toString());
                 }
             },
-            fun(_: VolleyError) {
-
+            { _: VolleyError ->
+                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         ) {
             override fun getHeaders(): Map<String, String> {
@@ -84,5 +93,15 @@ class HomePage : AppCompatActivity() {
         }
 
         requestQueue.add(request)
+    }
+
+    fun logout(view: View) {
+        val intent = Intent(view.context, LoginPage::class.java)
+        val nullToken = "{\"refresh\":\"\",\"access\":\"\"}"
+        FileHandler.writeToFile(view.context, nullToken, "auth")
+        Session.setLoggedInUser(null)
+
+        Toast.makeText(view.context, "Logged out", Toast.LENGTH_SHORT).show()
+        view.context.startActivity(intent)
     }
 }
