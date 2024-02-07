@@ -1,4 +1,4 @@
-package com.louie.studybuddy.models
+package com.louie.studybuddy.models.auth
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

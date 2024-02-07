@@ -1,7 +1,8 @@
-package com.louie.studybuddy.models
+package com.louie.studybuddy.models.auth
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
+import java.time.LocalDate
 
 class User(): Serializable {
     @JsonProperty("id")
@@ -22,14 +23,26 @@ class User(): Serializable {
     @JsonProperty("password")
     private lateinit var password: String
 
+    @JsonProperty("last_login")
+    private lateinit var lastLogin: LocalDate
+
     constructor(
         id: Long,
         username: String,
         email: String,
         firstName: String,
         lastName: String,
-        password: String
-    ) : this()
+        password: String,
+        lastLogin: LocalDate
+    ) : this() {
+        this.id = id
+        this.username = username
+        this.email = email
+        this.firstName = firstName
+        this.lastName = lastName
+        this.password = password
+        this.lastLogin = lastLogin
+    }
 
     fun id(id: Long): User {
         this.id = id
@@ -61,6 +74,11 @@ class User(): Serializable {
         return this
     }
 
+    fun setLastLogin(lastLogin: LocalDate): User {
+        this.lastLogin = lastLogin
+        return this
+    }
+
     fun getId(): Long {
         return id
     }
@@ -83,5 +101,13 @@ class User(): Serializable {
 
     fun getPassword(): String {
         return password
+    }
+
+    fun getLastLogin(): LocalDate {
+        return this.lastLogin
+    }
+
+    override fun toString(): String {
+        return this.email
     }
 }

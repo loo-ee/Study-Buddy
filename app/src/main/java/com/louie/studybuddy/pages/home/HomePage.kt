@@ -18,9 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.louie.studybuddy.R
-import com.louie.studybuddy.models.Token
-import com.louie.studybuddy.models.User
+import com.louie.studybuddy.models.auth.Token
+import com.louie.studybuddy.models.auth.User
 import com.louie.studybuddy.pages.login.LoginPage
+import com.louie.studybuddy.pages.my_tasks.MyTasksPage
 import com.louie.studybuddy.storage.FileHandler
 import com.louie.studybuddy.storage.ServerData
 import com.louie.studybuddy.storage.Session
@@ -42,7 +43,8 @@ class HomePage : AppCompatActivity() {
     }
 
     fun redirectMyTasks(view: View) {
-//        val intent = Intent(view.context, )
+        val intent = Intent(view.context, MyTasksPage::class.java)
+        view.context.startActivity(intent)
     }
 
     private fun getUser(context: Context) {
@@ -77,6 +79,7 @@ class HomePage : AppCompatActivity() {
                     val responseBody = response.toString()
                     val foundUser = objectMapper.readValue(responseBody, User::class.java)
                     Session.setLoggedInUser(foundUser)
+                    Log.d("volley", Session.getLoggedInUser()!!.getEmail())
                 } catch (e: JsonProcessingException) {
                     Log.d("exception_caught", e.toString());
                 }
